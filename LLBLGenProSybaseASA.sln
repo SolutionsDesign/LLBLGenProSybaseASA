@@ -14,19 +14,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SybaseAsaDQE", "DynamicQuer
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		DataDirect|Any CPU = DataDirect|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.DataDirect|Any CPU.ActiveCfg = Debug|Any CPU
-		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.DataDirect|Any CPU.Build.0 = Debug|Any CPU
 		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8EA03B04-9124-4078-8561-55AE43D87404}.DataDirect|Any CPU.ActiveCfg = DataDirect|Any CPU
-		{8EA03B04-9124-4078-8561-55AE43D87404}.DataDirect|Any CPU.Build.0 = DataDirect|Any CPU
 		{8EA03B04-9124-4078-8561-55AE43D87404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8EA03B04-9124-4078-8561-55AE43D87404}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EA03B04-9124-4078-8561-55AE43D87404}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -173,6 +173,9 @@
     <None Include="..\LLBLGenProSybaseASAKey.snk">
       <Link>LLBLGenProSybaseASAKey.snk</Link>
     </None>
+    <None Include="driver.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
