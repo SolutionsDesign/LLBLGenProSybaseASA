@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SybaseAsaDBDriver", "Driver\SybaseAsaDBDriver.csproj", "{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SharedItems", "SharedItems", "{33B8F11D-66BE-4B98-8272-1AC80100DE29}"
+	ProjectSection(SolutionItems) = preProject
+		LLBLGenProSybaseASAKey.snk = LLBLGenProSybaseASAKey.snk
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SybaseAsaDQE", "DynamicQueryEngine\SybaseAsaDQE.csproj", "{8EA03B04-9124-4078-8561-55AE43D87404}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		DataDirect|Any CPU = DataDirect|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.DataDirect|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.DataDirect|Any CPU.Build.0 = Debug|Any CPU
+		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FABDE1A-21DF-4FCB-96FD-BBFA8F18B1EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EA03B04-9124-4078-8561-55AE43D87404}.DataDirect|Any CPU.ActiveCfg = DataDirect|Any CPU
+		{8EA03B04-9124-4078-8561-55AE43D87404}.DataDirect|Any CPU.Build.0 = DataDirect|Any CPU
+		{8EA03B04-9124-4078-8561-55AE43D87404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EA03B04-9124-4078-8561-55AE43D87404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EA03B04-9124-4078-8561-55AE43D87404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EA03B04-9124-4078-8561-55AE43D87404}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
