@@ -8,7 +8,7 @@ we have published the sourcecode for the driver and DQE here on GitHub under the
 The sourcecode available here compiles against LLBLGen Pro v5.0.x assemblies. If you encounter code breaking changes, please file an issue on this repository so we can look into this. 
 
 ### Support on this sourcecode
-While Sybase ASA isn't officially supported anymore, we strive to keep this code compileable against the latest LLBLGen Pro version, if feasible. As we no longer have access to any Sybase ASA database nor ADO.NET provider for ASA, we can't test the code ourselves (and which is also the reason why we no longer support it officially). Please file an issue here if you run into an issue with compiling the code. We can't fix bugs / issues in the code for you as we can't test it on live databases anymore. However if you want to fix an issue yourself but need advice how to do so, e.g. because you're unfamiliar with how things work internally in the system, please ask the question as an issue here on GitHub and we'll try to help you as best as we can. 
+While LLBLGen Pro officially doesn't support Sybase ASA anymore, we strive to keep this code compileable against the latest LLBLGen Pro version, if feasible. As we no longer have access to any Sybase ASA database nor ADO.NET provider for ASA, we can't test the code ourselves (and which is also the reason why we no longer support it officially). Please file an issue here if you run into an issue with compiling the code. We can't fix bugs / issues in the code for you as we can't test it on live databases anymore. However if you want to fix an issue yourself but need advice how to do so, e.g. because you're unfamiliar with how things work internally in the system, please ask the question as an issue here on GitHub and we'll try to help you as best as we can. 
 
 ### Templates
 The Sybase ASA templates are still shipped with the LLBLGen Pro installer as it's otherwise perhaps a bit cumbersome to add a custom built driver / dqe to the system. The amount of templates specific for a database is very small so this isn't a big deal. 
@@ -17,7 +17,7 @@ The Sybase ASA templates are still shipped with the LLBLGen Pro installer as it'
 
 The driver supports: 
 
--   All features of v8.x or higher are supported except Java based types
+-   All features of iAnywhere v8.x or higher are supported except Java based types
     and proxy tables
 -   Owners `SYS`, `dbo`, `SA_DEBUG`, `rs_systabgroup` are
     filtered out.
