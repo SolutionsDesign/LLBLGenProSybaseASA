@@ -1,8 +1,8 @@
 ## Sybase iAnywhere (ASA) Driver / DQE for [LLBLGen Pro](http://www.llblgen.com)
 
-This is the repository for the Sybase iAnywhere (ASA) Driver and Dynamic Query Engine (DQE) for [LLBLGen Pro](http://www.llblgen.com) v5.x. It contains the sourcecode for the driver and DQE so users who move to v5.x and 
-need to support Sybase ASA can continue to do so. Starting with v5.0, [LLBLGen Pro](http://www.llblgen.com) doesn't officially support Sybase ASA anymore, and as a courtesy to our existing customers
-we have published the sourcecode for the driver and DQE here on GitHub under the flexible MIT license.
+This is the repository for the Sybase iAnywhere (ASA) Driver and Dynamic Query Engine (DQE) for [LLBLGen Pro](http://www.llblgen.com) v5.x. It contains the sourcecode for the driver and DQE so users who move to v5.x and need to support Sybase ASA can continue to do so. Starting with v5.0, [LLBLGen Pro](http://www.llblgen.com) doesn't officially support Sybase ASA anymore, and as a courtesy to our existing customers we have published the sourcecode for the driver and DQE here on GitHub under the flexible MIT license.
+
+The code in this repository references LLBLGen Pro v5.0 assemblies. It's easy to adjust them to the LLBLGen Pro version you're using though. 
 
 ### Compatiblity
 The sourcecode available here compiles against [LLBLGen Pro](http://www.llblgen.com) v5.0.x assemblies. If you encounter code breaking changes, please file an issue on this repository so we can look into this. 
@@ -11,7 +11,9 @@ The sourcecode available here compiles against [LLBLGen Pro](http://www.llblgen.
 While [LLBLGen Pro](http://www.llblgen.com) officially doesn't support Sybase ASA anymore, we strive to keep this code compileable against the latest [LLBLGen Pro](http://www.llblgen.com) version, if feasible. As we no longer have access to any Sybase ASA database nor ADO.NET provider for ASA, we can't test the code ourselves (and which is also the reason why we no longer support it officially). Please file an issue here if you run into an issue with compiling the code. We can't fix bugs / issues in the code for you as we can't test it on live databases anymore. However if you want to fix an issue yourself but need advice how to do so, e.g. because you're unfamiliar with how things work internally in the system, please ask the question as an issue here on GitHub and we'll try to help you as best as we can. 
 
 ### Templates
-The Sybase ASA templates are still shipped with the [LLBLGen Pro](http://www.llblgen.com) installer as it's otherwise perhaps a bit cumbersome to add a custom built driver / dqe to the system. The amount of templates specific for a database is very small so this isn't a big deal. 
+The contents of the `Templates` folder has to be copied into the *LLBLGen Pro installation folder*`\Frameworks\LLBLGen Pro\Templates`. Depending on which version of LLBLGen Pro you're using the contents of this repository with, you have to adjust the `dqeReferenceXmlInclude.template` template in the `Templates\SybaseAsaSpecific\Shared` folder: change `5.0.0.0` into the version you're using, e.g. `5.2.0.0`. Only Major/Minor version numbers matter, so e.g. v5.2.1 is still using assembly version 5.2.0.0. 
+
+The public key token has been adjusted for you in this template to the new self-signing key shipped with the DQE sourcecode in this repository.
 
 ### Features of the driver / DQE
 
@@ -47,7 +49,7 @@ To compile the DQE, make sure the references in the SybaseAsaDQE csproj are upda
 
 #### Deploying the DQE
 To use the DQE, just reference the compiled dll. See for more info about compiling the generated code and using a DQE, the [Compiling your code](http://www.llblgen.com/documentation/5.0/LLBLGen%20Pro%20RTF/Using%20the%20generated%20code/gencode_compiling.htm) topic in the 
-[[LLBLGen Pro](http://www.llblgen.com) Runtime Framework documentation](http://www.llblgen.com/documentation/5.0/LLBLGen%20Pro%20RTF/index.htm). 
+[LLBLGen Pro Runtime Framework documentation](http://www.llblgen.com/documentation/5.0/LLBLGen%20Pro%20RTF/index.htm). 
 
 ### License
 The sourcecode in this repository is licensed to you under the MIT license, given below.
@@ -75,3 +77,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+#### NuGet
+You are not allowed to publish the assemblies, compiled from the code in this repository, on NuGet as separate packages. 
