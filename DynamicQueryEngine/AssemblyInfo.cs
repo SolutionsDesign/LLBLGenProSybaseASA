@@ -15,6 +15,6 @@ using System.Security;
 [assembly: CLSCompliant(true)]
 
 [assembly: AllowPartiallyTrustedCallers()]
-[assembly: AssemblyVersion("5.0.0.0")]
-[assembly: AssemblyFileVersion("5.0.0")]
+[assembly: AssemblyVersion("5.4.0.0")]
+[assembly: AssemblyFileVersion("5.4.0")]
 [assembly: AssemblyDelaySign(false)]

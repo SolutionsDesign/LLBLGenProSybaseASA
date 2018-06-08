@@ -214,6 +214,16 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			return "[" + rawAlias + "]";
 		}
 
+		/// <inheritdoc />
+		public override void AppendValidIdentifier(QueryFragments toAppendTo, string rawIdentifier)
+		{
+			if (string.IsNullOrEmpty(rawIdentifier))
+			{
+				return;
+			}
+			toAppendTo.AddFragment(rawIdentifier);
+		}
+
 
 		/// <summary>
 		/// Creates a new dynamic query engine instance
@@ -233,16 +243,6 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		protected override void SetParameterType(DbParameter parameter, string parameterType)
 		{
 			_dbProviderFactoryInfo.SetParameterType(parameter, parameterType);
-		}
-
-
-		/// <summary>
-		/// Creates a name usable for a Parameter, based on "p" and a unique marker.
-		/// </summary>
-		/// <returns>Usable parameter name.</returns>
-		protected override string CreateParameterName()
-		{
-			return this.CreateParameterName("@");
 		}
 
 
