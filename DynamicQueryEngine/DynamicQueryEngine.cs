@@ -111,9 +111,6 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			TraceHelper.WriteLineIf(Switch.TraceInfo, "CreateSingleTargetInsertDQ", "Method Enter");
 			QueryFragments fragments = new QueryFragments();
 			fragments.AddFormatted("INSERT INTO {0}", this.Creator.CreateObjectName(fieldsPersistenceInfo[0]));
-			//DelimitedStringList fieldNames = fragments.AddCommaFragmentList(true);
-			//fragments.AddFragment("VALUES");
-			//DelimitedStringList valueFragments = fragments.AddCommaFragmentList(true);
 			var fieldNames = fragments.AddCommaDelimitedQueryFragments(true, 0);
 			fragments.AddFragment("VALUES");
 			var valueFragments = fragments.AddCommaDelimitedQueryFragments(true, 0);
@@ -148,8 +145,6 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 				if (hasIdentity)
 				{
 					// a table with just 1 identity field, use a special case query: INSERT INTO table values ()
-					//fieldNames.Clear();
-					//valueFragments.Clear();
 					fragments.AddFragment("()");
 				}
 				else

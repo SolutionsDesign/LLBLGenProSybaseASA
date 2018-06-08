@@ -53,7 +53,7 @@ namespace SD.LLBLGen.Pro.DBDrivers.SybaseAsa
 		private const string driverVersion = "5.0.20160127";
 		private const string driverVendor = "Solutions Design bv";
 		private const string driverCopyright = "(c)2002-2016 Solutions Design, all rights reserved.";
-		private const string driverID = "A3076322-977C-4e28-BFF4-F25ED096D1DB";
+		private const string driverID = "3FABDE1A-21DF-4fcb-96FD-BBFA8F18B1EA";
 		#endregion
 
 
