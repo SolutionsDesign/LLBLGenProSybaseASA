@@ -72,7 +72,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		static DynamicQueryEngine()
 		{
 			Switch = new TraceSwitch("SybaseAsaDQE", "Tracer for Sybase ASA Dynamic Query Engine");
-			SybaseAsaSpecificCreator.SetDbProviderFactoryParameterData("iAnywhere.Data.SQLAnywhere", "iAnywhere.Data.SQLAnywhere.SADbType", "SADbType");
+			SybaseAsaSpecificCreator.SetDbProviderFactoryParameterData("Sap.Data.SQLAnywhere", "Sap.Data.SQLAnywhere.SADbType", "SADbType");
 
 			_schemaOverwrites = new Dictionary<string, string>();
 			NameValueCollection schemaOverwriteDefinitions = (NameValueCollection)ConfigurationManager.GetSection("sybaseAsaSchemaNameOverwrites");

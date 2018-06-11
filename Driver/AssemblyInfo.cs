@@ -17,4 +17,4 @@ using System.Reflection;
 // associated with an assembly.
 //
 [assembly: AssemblyTitle("SybaseAsaDBDriver")]
-[assembly: AssemblyDescription("Sybase ASA iAnywhere implementation for LLBLGen Pro")]
+[assembly: AssemblyDescription("SAP SQL Anywhere (Sybase ASA) implementation for LLBLGen Pro")]
