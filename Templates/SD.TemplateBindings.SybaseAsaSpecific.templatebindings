@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <templateBindings xmlns="http://sd/llblgen/pro/templateBindingsDefinition.xsd" name="SD.TemplateBindings.SybaseAsaSpecific"
-				  description ="Template bindings for the templates which are specific for Sybase ASE databases."
+				  description ="Template bindings for the templates which are specific for Sybase ASA databases."
 				  databaseDriverID="3FABDE1A-21DF-4fcb-96FD-BBFA8F18B1EA" precedenceLevel="10">
 	<supportedPlatforms>
 		<platform name=".NET 3.5"/>
