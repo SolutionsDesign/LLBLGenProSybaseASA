@@ -74,6 +74,17 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			_dbProviderFactoryInfo.SetDbProviderFactoryParameterData(dbProviderFactoryInvariantName, dbProviderSpecificEnumTypeName, dbProviderSpecificEnumTypePropertyName);
 		}
 
+		/// <summary>
+		/// Sets the db provider factory parameter data. This will influence which DbProviderFactory is used and which enum types the field persistence info
+		/// field type names are resolved to.
+		/// </summary>
+		/// <param name="dbProviderFactoryInvariantNamesAndEnumTypeNames">The database provider factory invariant names and enum type names.</param>
+		/// <param name="dbProviderSpecificEnumTypePropertyName">Name of the db provider specific enum type property.</param>
+		public static void SetDbProviderFactoryParameterData(List<ValuePair<string, string>> dbProviderFactoryInvariantNamesAndEnumTypeNames, string dbProviderSpecificEnumTypePropertyName)
+		{
+			_dbProviderFactoryInfo.SetDbProviderFactoryParameterData(dbProviderFactoryInvariantNamesAndEnumTypeNames, dbProviderSpecificEnumTypePropertyName);
+		}
+
 
 		/// <summary>
 		/// Determines the db type name for value.
