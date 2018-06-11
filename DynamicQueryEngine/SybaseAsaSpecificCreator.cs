@@ -97,12 +97,12 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		{
 			realValueToUse = value;
 			string toReturn = "VarChar";
-			if(value!=null)
+			if (value != null)
 			{
-				switch(value.GetType().UnderlyingSystemType.FullName)
+				switch (value.GetType().UnderlyingSystemType.FullName)
 				{
 					case "System.String":
-						if(((string)value).Length < 4000)
+						if (((string)value).Length < 4000)
 						{
 							toReturn = "NVarChar";
 						}
@@ -165,7 +165,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		public override DbParameter CreateLikeParameter(string pattern, string targetFieldDbType)
 		{
 			string typeOfParameter = targetFieldDbType;
-			switch(typeOfParameter)
+			switch (typeOfParameter)
 			{
 				case "Text":
 					typeOfParameter = "VarChar";
@@ -197,7 +197,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		{
 			StringBuilder name = new StringBuilder();
 			string schemaNameToUse = new DynamicQueryEngine().GetNewSchemaName(this.GetNewPerCallSchemaName(schemaName));
-			if(schemaNameToUse.Length > 0)
+			if (schemaNameToUse.Length > 0)
 			{
 				name.AppendFormat("{0}.", CreateValidAlias(schemaNameToUse));
 			}
@@ -214,14 +214,14 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		/// <returns>valid alias string to use.</returns>
 		public override string CreateValidAlias(string rawAlias)
 		{
-			if(string.IsNullOrEmpty(rawAlias))
+			if (string.IsNullOrEmpty(rawAlias))
 			{
 				return rawAlias;
 			}
-			if(rawAlias[0] == '[')
+			if (rawAlias[0] == '[')
 			{
 				return rawAlias;
-			} 
+			}
 			return "[" + rawAlias + "]";
 		}
 
@@ -232,9 +232,15 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			{
 				return;
 			}
-			toAppendTo.AddFragment(rawIdentifier);
+			if (rawIdentifier[0] == '[')
+			{
+				toAppendTo.AddFragment(rawIdentifier);
+			}
+			else
+			{
+				toAppendTo.AddStringFragmentsAsSingleUnit("[", rawIdentifier, "]");
+			}
 		}
-
 
 		/// <summary>
 		/// Creates a new dynamic query engine instance
@@ -270,7 +276,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		protected override string ConstructCallToAggregateWithFieldAsParameter(AggregateFunction function, string fieldName)
 		{
 			AggregateFunction toUse = function;
-			switch(toUse)
+			switch (toUse)
 			{
 				case AggregateFunction.CountBig:
 					toUse = AggregateFunction.Count;
@@ -287,6 +293,15 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 
 
 		#region Class Property Declarations
+
+		/// <summary>
+		/// Gets the parameter prefix, if required. If no parameter prefix is required, this property will return the empty string (by default it returns the empty string).
+		/// </summary>
+		protected override string ParameterPrefix
+		{
+			get { return "@"; }
+		}
+
 		/// <summary>
 		/// Gets the DbProviderFactory instance to use.
 		/// </summary>
@@ -294,6 +309,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		{
 			get { return _dbProviderFactoryInfo.FactoryToUse; }
 		}
+
 		#endregion
 	}
 }
