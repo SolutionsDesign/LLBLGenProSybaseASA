@@ -74,6 +74,17 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			_dbProviderFactoryInfo.SetDbProviderFactoryParameterData(dbProviderFactoryInvariantName, dbProviderSpecificEnumTypeName, dbProviderSpecificEnumTypePropertyName);
 		}
 
+		/// <summary>
+		/// Sets the db provider factory parameter data. This will influence which DbProviderFactory is used and which enum types the field persistence info
+		/// field type names are resolved to.
+		/// </summary>
+		/// <param name="dbProviderFactoryInvariantNamesAndEnumTypeNames">The database provider factory invariant names and enum type names.</param>
+		/// <param name="dbProviderSpecificEnumTypePropertyName">Name of the db provider specific enum type property.</param>
+		public static void SetDbProviderFactoryParameterData(List<ValuePair<string, string>> dbProviderFactoryInvariantNamesAndEnumTypeNames, string dbProviderSpecificEnumTypePropertyName)
+		{
+			_dbProviderFactoryInfo.SetDbProviderFactoryParameterData(dbProviderFactoryInvariantNamesAndEnumTypeNames, dbProviderSpecificEnumTypePropertyName);
+		}
+
 
 		/// <summary>
 		/// Determines the db type name for value.
@@ -86,12 +97,12 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		{
 			realValueToUse = value;
 			string toReturn = "VarChar";
-			if(value!=null)
+			if (value != null)
 			{
-				switch(value.GetType().UnderlyingSystemType.FullName)
+				switch (value.GetType().UnderlyingSystemType.FullName)
 				{
 					case "System.String":
-						if(((string)value).Length < 4000)
+						if (((string)value).Length < 4000)
 						{
 							toReturn = "NVarChar";
 						}
@@ -154,7 +165,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		public override DbParameter CreateLikeParameter(string pattern, string targetFieldDbType)
 		{
 			string typeOfParameter = targetFieldDbType;
-			switch(typeOfParameter)
+			switch (typeOfParameter)
 			{
 				case "Text":
 					typeOfParameter = "VarChar";
@@ -186,7 +197,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		{
 			StringBuilder name = new StringBuilder();
 			string schemaNameToUse = new DynamicQueryEngine().GetNewSchemaName(this.GetNewPerCallSchemaName(schemaName));
-			if(schemaNameToUse.Length > 0)
+			if (schemaNameToUse.Length > 0)
 			{
 				name.AppendFormat("{0}.", CreateValidAlias(schemaNameToUse));
 			}
@@ -203,17 +214,33 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		/// <returns>valid alias string to use.</returns>
 		public override string CreateValidAlias(string rawAlias)
 		{
-			if(string.IsNullOrEmpty(rawAlias))
+			if (string.IsNullOrEmpty(rawAlias))
 			{
 				return rawAlias;
 			}
-			if(rawAlias[0] == '[')
+			if (rawAlias[0] == '[')
 			{
 				return rawAlias;
-			} 
+			}
 			return "[" + rawAlias + "]";
 		}
 
+		/// <inheritdoc />
+		public override void AppendValidIdentifier(QueryFragments toAppendTo, string rawIdentifier)
+		{
+			if (string.IsNullOrEmpty(rawIdentifier))
+			{
+				return;
+			}
+			if (rawIdentifier[0] == '[')
+			{
+				toAppendTo.AddFragment(rawIdentifier);
+			}
+			else
+			{
+				toAppendTo.AddStringFragmentsAsSingleUnit("[", rawIdentifier, "]");
+			}
+		}
 
 		/// <summary>
 		/// Creates a new dynamic query engine instance
@@ -237,16 +264,6 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 
 
 		/// <summary>
-		/// Creates a name usable for a Parameter, based on "p" and a unique marker.
-		/// </summary>
-		/// <returns>Usable parameter name.</returns>
-		protected override string CreateParameterName()
-		{
-			return this.CreateParameterName("@");
-		}
-
-
-		/// <summary>
 		/// Constructs a call to the aggregate function specified with the field name specified as parameter.
 		/// </summary>
 		/// <param name="function">The function.</param>
@@ -259,7 +276,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		protected override string ConstructCallToAggregateWithFieldAsParameter(AggregateFunction function, string fieldName)
 		{
 			AggregateFunction toUse = function;
-			switch(toUse)
+			switch (toUse)
 			{
 				case AggregateFunction.CountBig:
 					toUse = AggregateFunction.Count;
@@ -276,6 +293,15 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 
 
 		#region Class Property Declarations
+
+		/// <summary>
+		/// Gets the parameter prefix, if required. If no parameter prefix is required, this property will return the empty string (by default it returns the empty string).
+		/// </summary>
+		protected override string ParameterPrefix
+		{
+			get { return "@"; }
+		}
+
 		/// <summary>
 		/// Gets the DbProviderFactory instance to use.
 		/// </summary>
@@ -283,6 +309,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		{
 			get { return _dbProviderFactoryInfo.FactoryToUse; }
 		}
+
 		#endregion
 	}
 }

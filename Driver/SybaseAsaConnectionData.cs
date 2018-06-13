@@ -151,7 +151,7 @@ namespace SD.LLBLGen.Pro.DBDrivers.SybaseAsa
 		/// <summary>
 		/// Gets or sets the name of the server.
 		/// </summary>
-		[Description("The name of the Sybase iAnywhere server to connect to.")]
+		[Description("The name of the SAP SQL Anywhere server to connect to.")]
 		[Category("General")]
 		public string ServerName
 		{
@@ -168,7 +168,7 @@ namespace SD.LLBLGen.Pro.DBDrivers.SybaseAsa
 		/// <summary>
 		/// Gets or sets the name of the database.
 		/// </summary>
-		[Description("The Sybase iAnywhere database to connect to.")]
+		[Description("The SAP SQL Anywhere database to connect to.")]
 		[Category("General")]
 		public string DatabaseName
 		{

@@ -675,7 +675,7 @@ namespace SD.LLBLGen.Pro.DBDrivers.SybaseAsa
 		/// <returns>list of invariant names</returns>
 		protected override List<string> GetDbProviderFactoryInvariantNames()
 		{
-			return new List<string> { "iAnywhere.Data.SQLAnywhere" };
+			return new List<string> { "iAnywhere.Data.SQLAnywhere", "Sap.Data.SQLAnywhere" };
 		}
 
 

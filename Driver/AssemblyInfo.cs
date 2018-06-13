@@ -7,8 +7,8 @@ using System.Reflection;
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyConfiguration(".NET 4.5")]
 
-[assembly: AssemblyVersion("5.0.0.0")]
-[assembly: AssemblyFileVersion("5.0.0")]
+[assembly: AssemblyVersion("5.4.0.0")]
+[assembly: AssemblyFileVersion("5.4.0")]
 [assembly: AssemblyDelaySign(false)]
 
 //
@@ -17,4 +17,4 @@ using System.Reflection;
 // associated with an assembly.
 //
 [assembly: AssemblyTitle("SybaseAsaDBDriver")]
-[assembly: AssemblyDescription("Sybase ASA iAnywhere implementation for LLBLGen Pro")]
+[assembly: AssemblyDescription("SAP SQL Anywhere (Sybase ASA) implementation for LLBLGen Pro")]

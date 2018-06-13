@@ -54,7 +54,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 	public class DynamicQueryEngine : DynamicQueryEngineBase
 	{
 		#region Static members
-		private static readonly Dictionary<string, string>	_schemaOverwrites;
+		private static readonly Dictionary<string, string> _schemaOverwrites;
 		private static readonly Regex _procMatchingMatcher = new Regex(@"(?<schemaName>\[[\w\. \$@#]+\]|\w+).(?<procName>\[[\w\. \$@#]+\])", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 		private static readonly FunctionMappingStore _functionMappings = new FunctionMappingStore();
 		#endregion
@@ -62,7 +62,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		/// <summary>
 		/// Creates a new <see cref="DynamicQueryEngine"/> instance.
 		/// </summary>
-		public DynamicQueryEngine():base()
+		public DynamicQueryEngine() : base()
 		{
 		}
 
@@ -72,17 +72,21 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		static DynamicQueryEngine()
 		{
 			Switch = new TraceSwitch("SybaseAsaDQE", "Tracer for Sybase ASA Dynamic Query Engine");
-			SybaseAsaSpecificCreator.SetDbProviderFactoryParameterData("iAnywhere.Data.SQLAnywhere", "iAnywhere.Data.SQLAnywhere.SADbType",  "SADbType");
+			SybaseAsaSpecificCreator.SetDbProviderFactoryParameterData(new List<ValuePair<string, string>>
+			{
+				new ValuePair<string, string>("iAnywhere.Data.SQLAnywhere", "iAnywhere.Data.SQLAnywhere.SADbType"),
+				new ValuePair<string, string>("Sap.Data.SQLAnywhere", "Sap.Data.SQLAnywhere.SADbType")
+			}, "SADbType");
 
 			_schemaOverwrites = new Dictionary<string, string>();
 			NameValueCollection schemaOverwriteDefinitions = (NameValueCollection)ConfigurationManager.GetSection("sybaseAsaSchemaNameOverwrites");
-			if(schemaOverwriteDefinitions!=null)
+			if (schemaOverwriteDefinitions != null)
 			{
-				for(int i=0;i<schemaOverwriteDefinitions.Count;i++)
+				for (int i = 0; i < schemaOverwriteDefinitions.Count; i++)
 				{
 					string key = schemaOverwriteDefinitions.GetKey(i);
 					string value = schemaOverwriteDefinitions.Get(i);
-					if(_schemaOverwrites.ContainsKey(key))
+					if (_schemaOverwrites.ContainsKey(key))
 					{
 						continue;
 					}
@@ -111,24 +115,24 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			TraceHelper.WriteLineIf(Switch.TraceInfo, "CreateSingleTargetInsertDQ", "Method Enter");
 			QueryFragments fragments = new QueryFragments();
 			fragments.AddFormatted("INSERT INTO {0}", this.Creator.CreateObjectName(fieldsPersistenceInfo[0]));
-			DelimitedStringList fieldNames = fragments.AddCommaFragmentList(true);
+			var fieldNames = fragments.AddCommaDelimitedQueryFragments(true, 0);
 			fragments.AddFragment("VALUES");
-			DelimitedStringList valueFragments = fragments.AddCommaFragmentList(true);
+			var valueFragments = fragments.AddCommaDelimitedQueryFragments(true, 0);
 
 			DbParameter newParameter;
 			bool hasIdentity = false;
-			for(int i = 0; i < fields.Length; i++)
+			for (int i = 0; i < fields.Length; i++)
 			{
 				IEntityFieldCore field = fields[i];
 				IFieldPersistenceInfo persistenceInfo = fieldsPersistenceInfo[i];
 
-				if(string.IsNullOrEmpty(persistenceInfo.IdentityValueSequenceName))
+				if (string.IsNullOrEmpty(persistenceInfo.IdentityValueSequenceName))
 				{
-					if(!CheckIfFieldNeedsInsertAction(field))
+					if (!CheckIfFieldNeedsInsertAction(field))
 					{
 						continue;
 					}
-					fieldNames.Add(this.Creator.CreateFieldNameSimple(persistenceInfo, field.Name));
+					fieldNames.AddFragment(this.Creator.CreateFieldNameSimple(persistenceInfo, field.Name));
 					AppendFieldToValueFragmentsForInsert(query, fieldToParameter, valueFragments, field, persistenceInfo);
 				}
 				else
@@ -140,13 +144,11 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 					fieldToParameter.Add(field, newParameter);
 				}
 			}
-			if(fieldNames.Count<=0)
+			if (fieldNames.Count <= 0)
 			{
-				if(hasIdentity)
+				if (hasIdentity)
 				{
 					// a table with just 1 identity field, use a special case query: INSERT INTO table values ()
-					fieldNames.Clear();
-					valueFragments.Clear();
 					fragments.AddFragment("()");
 				}
 				else
@@ -273,12 +275,12 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			fragments.AddFragment("SELECT");
 			StringPlaceHolder distinctPlaceholder = fragments.AddPlaceHolder();
 			StringPlaceHolder topPlaceholder = fragments.AddPlaceHolder();
-			DelimitedStringList projection = fragments.AddCommaFragmentList(false);
+			var projection = fragments.AddCommaDelimitedQueryFragments(false, 0);
 
 			UniqueList<string> fieldNamesInSelectList;
 			bool distinctViolatingTypesFound;
 			bool pkFieldSeen;
-			AppendResultsetFields(selectList, fieldsPersistenceInfo, relationsToWalk, projection, sortClausesSpecified, allowDuplicates, true, new UniqueList<string>(), 
+			AppendResultsetFields(selectList, fieldsPersistenceInfo, relationsToWalk, projection, sortClausesSpecified, allowDuplicates, true, new UniqueList<string>(),
 									query, out fieldNamesInSelectList, out distinctViolatingTypesFound, out pkFieldSeen);
 
 			bool resultsCouldContainDuplicates = this.DetermineIfDuplicatesWillOccur(relationsToWalk);
@@ -286,10 +288,10 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 														(pkFieldSeen && !resultsCouldContainDuplicates), fieldNamesInSelectList);
 
 			bool groupByClauseSpecified = ((groupByClause != null) && (groupByClause.Count > 0));
-			if(maxNumberOfItemsToReturn > 0)
+			if (maxNumberOfItemsToReturn > 0)
 			{
 				// row limits are emitted always, unless duplicates are required but DISTINCT wasn't emitable. If not emitable, switch to client-side row limitation
-				if(distinctEmitted || !resultsCouldContainDuplicates || groupByClauseSpecified || allowDuplicates)
+				if (distinctEmitted || !resultsCouldContainDuplicates || groupByClauseSpecified || allowDuplicates)
 				{
 					topPlaceholder.SetFormatted("TOP {0}", maxNumberOfItemsToReturn);
 				}
@@ -299,7 +301,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 					query.ManualRowsToTake = (int)maxNumberOfItemsToReturn;
 				}
 			}
-			if(relationsSpecified)
+			if (relationsSpecified)
 			{
 				fragments.AddFormatted("FROM {0}", relationsToWalk.ToQueryText());
 				query.AddParameters(((RelationCollection)relationsToWalk).CustomFilterParameters);
@@ -307,11 +309,11 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			else
 			{
 				var persistenceInfoToUse = fieldsPersistenceInfo.FirstOrDefault(p => p != null);
-				if((persistenceInfoToUse != null) && (persistenceInfoToUse.SourceObjectName.Length > 0))
+				if ((persistenceInfoToUse != null) && (persistenceInfoToUse.SourceObjectName.Length > 0))
 				{
 					fragments.AddFormatted(" FROM {0}", this.Creator.CreateObjectName(persistenceInfoToUse));
 					string targetAlias = this.DetermineTargetAlias(selectList[0], relationsToWalk);
-					if(targetAlias.Length > 0)
+					if (targetAlias.Length > 0)
 					{
 						fragments.AddFormatted(" {0}", this.Creator.CreateValidAlias(targetAlias));
 					}
@@ -353,16 +355,16 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		/// <remarks>
 		/// Generic version
 		/// </remarks>
-		protected override IRetrievalQuery CreatePagingSelectDQ(IEntityFieldCore[] selectList, IFieldPersistenceInfo[] fieldsPersistenceInfo, 
-																DbConnection connectionToUse, IPredicate selectFilter, int rowsToSkip, int rowsToTake, 
-																ISortExpression sortClauses, IRelationCollection relationsToWalk, bool allowDuplicates, 
+		protected override IRetrievalQuery CreatePagingSelectDQ(IEntityFieldCore[] selectList, IFieldPersistenceInfo[] fieldsPersistenceInfo,
+																DbConnection connectionToUse, IPredicate selectFilter, int rowsToSkip, int rowsToTake,
+																ISortExpression sortClauses, IRelationCollection relationsToWalk, bool allowDuplicates,
 																IGroupByCollection groupByClause)
 		{
 			TraceHelper.WriteLineIf(Switch.TraceInfo, "CreatePagingSelectDQ", "Method Enter");
 
 			long max = 0;
 			bool pagingRequired = true;
-			if(rowsToSkip<=0)
+			if (rowsToSkip <= 0)
 			{
 				// no paging.
 				max = rowsToTake;
@@ -370,16 +372,16 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			}
 
 			IRetrievalQuery normalQuery = this.CreateSelectDQ(selectList, fieldsPersistenceInfo, connectionToUse, selectFilter, max, sortClauses, relationsToWalk, allowDuplicates, groupByClause);
-			if(!pagingRequired)
+			if (!pagingRequired)
 			{
 				TraceHelper.WriteLineIf(Switch.TraceInfo, "CreatePagingSelectDQ: no paging.", "Method Exit");
 				return normalQuery;
 			}
 			bool emitQueryToTrace = false;
-			if(normalQuery.RequiresClientSideDistinctFiltering)
+			if (normalQuery.RequiresClientSideDistinctFiltering)
 			{
 				// manual paging required
-				normalQuery.RequiresClientSidePaging=pagingRequired;
+				normalQuery.RequiresClientSidePaging = pagingRequired;
 				normalQuery.ManualRowsToSkip = rowsToSkip;
 				normalQuery.ManualRowsToTake = rowsToTake;
 			}
@@ -387,11 +389,11 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			{
 				// normal paging. Embed paging logic. There is no TOP statement in the query as we've passed '0' for maxAmountOfItemsToReturn
 				string upperLimitSnippet = string.Empty;
-				if(rowsToTake > 0)
+				if (rowsToTake > 0)
 				{
 					upperLimitSnippet = string.Format(" TOP {0}", rowsToTake);
 				}
-				if(normalQuery.Command.CommandText.ToLowerInvariant().StartsWith("select distinct"))
+				if (normalQuery.Command.CommandText.ToLowerInvariant().StartsWith("select distinct"))
 				{
 					normalQuery.Command.CommandText = String.Format("SELECT DISTINCT{0} START AT {1} {2}",
 																	upperLimitSnippet, rowsToSkip + 1, normalQuery.Command.CommandText.Substring(16));
@@ -422,13 +424,13 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		{
 			string toMatch = this.Creator.StripObjectNameChars(currentName);
 			string toReturn = currentName;
-			if(_schemaOverwrites.ContainsKey("*"))
+			if (_schemaOverwrites.ContainsKey("*"))
 			{
 				toReturn = _schemaOverwrites["*"];
 			}
 			else
 			{
-				if((_schemaOverwrites.Count > 0) && (_schemaOverwrites.ContainsKey(toMatch)))
+				if ((_schemaOverwrites.Count > 0) && (_schemaOverwrites.ContainsKey(toMatch)))
 				{
 					toReturn = _schemaOverwrites[toMatch];
 				}
@@ -450,7 +452,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 
 			MatchCollection matchesFound = procNamePartFinder.Matches(currentName);
 
-			if(matchesFound.Count<=0)
+			if (matchesFound.Count <= 0)
 			{
 				// just the proc name, or some weird format we don't support, return the proc name
 				return currentName;
@@ -459,7 +461,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			// there's just 1 match:
 			string schemaName = matchesFound[0].Groups["schemaName"].Value;
 			string procName = matchesFound[0].Groups["procName"].Value;
-			
+
 			return GetNewSchemaName(schemaName) + "." + procName;
 		}
 
@@ -476,7 +478,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			Regex procNamePartFinder = _procMatchingMatcher;
 			MatchCollection matchesFound = procNamePartFinder.Matches(currentName);
 
-			if(matchesFound.Count<=0)
+			if (matchesFound.Count <= 0)
 			{
 				// just the proc name, or some weird format we don't support, return the proc name
 				return currentName;
@@ -485,7 +487,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			// there's just 1 match:
 			string schemaName = matchesFound[0].Groups["schemaName"].Value;
 			string procName = matchesFound[0].Groups["procName"].Value;
-			
+
 			return ((DbSpecificCreatorBase)this.Creator).GetNewPerCallSchemaName(schemaName) + "." + procName;
 		}
 		#endregion
@@ -550,7 +552,7 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			_functionMappings.Add(new FunctionMapping(typeof(Convert), "ToSingle", 1, "CONVERT(REAL, {0})"));
 			// ToString(1)
 			_functionMappings.Add(new FunctionMapping(typeof(Convert), "ToString", 1, "CONVERT(NVARCHAR(4000), {0})"));
-			
+
 			////////////////////////////////////////////////
 			// byte related functions
 			////////////////////////////////////////////////
