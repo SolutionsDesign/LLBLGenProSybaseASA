@@ -1,0 +1,77 @@
+﻿<~
+	// The enum definition for the Dbtypes as it is used by the sybase asa driver. Used here to determine in readable code
+	// if a field requires a length specification and/or collation specifications emitted in the DDL
+	public enum AsaDbTypes:int
+	{
+		BigInt,
+		Binary,
+		Bit,
+		Char,
+		Date,
+		DateTime,
+		Decimal,
+		Double,
+		FloatReal,
+		FloatDouble,
+		Image,
+		Integer,
+		LongBinary,
+		LongNVarChar,
+		LongVarBit,
+		LongVarChar,
+		Money,
+		NChar,
+		NText,
+		Numeric,
+		NVarChar,
+		Real,
+		SmallDateTime,
+		SmallInt,
+		SmallMoney,
+		Text,
+		Time,
+		TimeStamp,
+		TinyInt,
+		UniqueIdentifier,
+		UnsignedBigInt,
+		UnsignedInt,
+		UnsignedSmallInt,
+		VarBinary,
+		VarBit,
+		VarChar,
+		Xml,
+	}
+	
+	// Creates the string which defines the field, complete with name, type, identity (if applicable) and nullable/not nullable
+	private string CreateFieldDefinitionString(DBTableField field)
+	{
+		StringBuilder toReturn = new StringBuilder();
+		toReturn.AppendFormat("[{0}] {1}", field.FieldName, field.TypeDefinition.DBTypeAsString);
+		switch((AsaDbTypes)field.TypeDefinition.DBType)
+		{
+			case AsaDbTypes.Decimal:
+			case AsaDbTypes.Numeric:
+				toReturn.AppendFormat(" ({0}, {1})", field.TypeDefinition.Precision, field.TypeDefinition.Scale);
+				break;
+			case AsaDbTypes.Binary:
+			case AsaDbTypes.Char:
+			case AsaDbTypes.NChar:
+			case AsaDbTypes.NVarChar:
+			case AsaDbTypes.VarBinary:
+			case AsaDbTypes.VarBit:
+			case AsaDbTypes.VarChar:
+				toReturn.AppendFormat(" ({0})", field.TypeDefinition.Length);
+				break;
+		}
+		if(field.IsIdentity)
+		{
+			toReturn.Append(" DEFAULT AUTOINCREMENT");
+		}
+		if(!field.IsNullable)
+		{
+			toReturn.Append(" NOT");
+		}
+		toReturn.Append(" NULL");
+		return toReturn.ToString();
+	}
+~>

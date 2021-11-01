@@ -1,0 +1,4 @@
+﻿<% // the name of the schema is in the variable 'schemaName'. The name of the table is in the variable 'tableName', the name of the constraint
+   // is in the variable 'constraintName'%>
+ALTER TABLE [<%=schemaName%>].[<%=tableName%>]
+	DROP PRIMARY KEY;

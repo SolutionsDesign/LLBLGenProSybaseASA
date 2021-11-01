@@ -1,0 +1,3 @@
+﻿<% // the name of the schema is in the variable 'schemaName'. The name of the table is in the variable 'tableName', the name of the field
+   // is in the variable 'fieldName'%>
+ALTER TABLE [<%=schemaName%>].[<%=tableName%>] DROP [<%=fieldName%>];

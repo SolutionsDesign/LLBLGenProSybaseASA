@@ -1,0 +1,7 @@
+﻿<% // the name of the catalog is in the variable 'catalogName', the name of the schema is in the variable 'schemaName'. The DBTable object
+   // is in the variable 'table', the constraint name is in the variable 'constraintName'.%>
+ALTER TABLE [<%=schemaName%>].[<%=table.Name%>]
+	ADD CONSTRAINT [<%=constraintName%>] PRIMARY KEY CLUSTERED 
+	( 
+		<%=string.Join(", ", table.PrimaryKeyFields.OrderBy(f=>f.OrdinalPosition).Select(f=>string.Format("[{0}]", f.FieldName)).ToArray())%> 
+	);

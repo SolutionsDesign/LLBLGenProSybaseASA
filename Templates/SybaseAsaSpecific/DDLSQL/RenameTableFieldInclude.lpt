@@ -1,0 +1,3 @@
+﻿<% // The field to rename is stored in the variable 'field'. The current schema is in the variable 'schema' %>
+ALTER TABLE [<%=schema.SchemaOwner%>].[<%=field.ParentTable.Name%>]
+	RENAME [<%=GetOriginalName(field)%>] TO [<%=GetNewName(field)%>];

@@ -1,0 +1,10 @@
+﻿<% // the name of the catalog is in the variable 'catalogName', the name of the schema is in the variable 'schemaName'. The table name
+   // is in the variable 'tableName', the DBTableField object is in the variable 'field'.%>
+ALTER TABLE [<%=schemaName%>].[<%=tableName%>] 
+	ALTER <%=CreateFieldDefinitionString(field)%>;
+<%	if(field.HasChangeFlagsSet((int)DBTableFieldChangeType.IsIdentity) && !field.IsIdentity)
+	{
+		// drop default autoincrement clause
+%>ALTER TABLE [<%=schemaName%>].[<%=tableName%>]
+	ALTER [<%=field.FieldName%>] DROP DEFAULT;
+<%	}%>

@@ -1,0 +1,2 @@
+﻿<% // the name of the schema is in the variable 'schemaName'. The name of the table is in the variable 'tableName'%>
+DROP TABLE [<%=schemaName%>].[<%=tableName%>];

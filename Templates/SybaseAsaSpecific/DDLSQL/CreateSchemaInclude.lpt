@@ -1,0 +1,2 @@
+﻿<% // the name of the catalog is in the variable 'catalogName', the name of the schema is in the variable 'schemaName'.
+%>CREATE SCHEMA AUTHORIZATION [<%=schemaName%>];

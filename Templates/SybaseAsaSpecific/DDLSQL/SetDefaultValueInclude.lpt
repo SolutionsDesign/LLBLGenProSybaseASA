@@ -1,0 +1,6 @@
+﻿<%	// the name of the catalog is in the variable 'catalogName', the name of the schema is in the variable 'schemaName'. 
+	// the name of the table is in the variable 'tableName'. The name of the field the default is for is in the variable 'fieldName'.
+	// the default value in string format is in the variable 'defaultValue'. A new constraint name is stored in the variable 'constraintName'.
+	// the value in defaultValue is already pre-formatted with '' characters for string values. 
+%>ALTER TABLE [<%=schemaName%>].[<%=tableName%>] 
+	ALTER COLUMN [<%=fieldName%>] DEFAULT <%=defaultValue%>;

@@ -1,0 +1,15 @@
+﻿<% // the name of the catalog is in the variable 'catalogName', the name of the schema is in the variable 'schemaName'. The foreign key DBTable object
+   // is in the variable 'fkTable', the primary key DBTable object is in the variable 'pkTable', the constraint name is in the variable 'constraintName'. 
+   // The DBForeignKeyConstraint object is in the variable 'foreignKeyConstraint'.
+   // Field pairs are stored in fkPkFieldPairs, which is of type IEnumerable<Pair<IProjectElementFieldMapTargetElement, IProjectElementFieldMapTargetElement>>
+   // and contains, ordered by pk field ordinal, a pair for every fk field - pk field pair in the foreign key constraint. Value1 in the pair is the
+   // foreign key field, Value2 is the primary key field.%>
+ALTER TABLE [<%=schemaName%>].[<%=tableName%>] 
+	ADD CONSTRAINT [<%=constraintName%>] FOREIGN KEY
+	(
+		<%=string.Join(", ", fkPkFieldPairs.Select(p=>p.Value1).Select(f=>string.Format("[{0}]", f.FieldName)).ToArray())%> 
+	)
+	REFERENCES [<%=pkTable.ContainingSchema.SchemaOwner%>].[<%=pkTable.Name%>]
+	(
+		<%=string.Join(", ", fkPkFieldPairs.Select(p=>p.Value2).Select(f=>string.Format("[{0}]", f.FieldName)).ToArray())%> 
+	);

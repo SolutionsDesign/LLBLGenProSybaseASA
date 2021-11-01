@@ -1,0 +1,4 @@
+﻿<% // the name of the catalog is in the variable 'catalogName', the name of the schema is in the variable 'schemaName'. The table name
+   // is in the variable 'tableName', the DBTableField object is in the variable 'field'.%>
+ALTER TABLE [<%=schemaName%>].[<%=tableName%>] 
+	ADD <%=CreateFieldDefinitionString(field)%>;

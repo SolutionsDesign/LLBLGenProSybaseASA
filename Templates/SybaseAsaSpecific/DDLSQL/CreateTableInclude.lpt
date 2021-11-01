@@ -1,0 +1,6 @@
+﻿<% // the name of the catalog is in the variable 'catalogName', the name of the schema is in the variable 'schemaName'. The DBTable object
+   // is in the variable 'table'.%>
+CREATE TABLE [<%=schemaName%>].[<%=table.Name%>] 
+(
+	<%=string.Join(string.Format(", {0}\t", Environment.NewLine), table.Fields.Select(f=>CreateFieldDefinitionString(f)).ToArray())%> 
+);
