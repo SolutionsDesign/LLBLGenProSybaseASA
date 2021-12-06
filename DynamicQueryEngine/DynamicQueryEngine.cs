@@ -239,139 +239,66 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 		#endregion
 
 		#region Dynamic Select Query construction methods.
-		/// <summary>
-		/// Creates a new Select Query which is ready to use, based on the specified select list and the specified set of relations.
-		/// If selectFilter is set to null, all rows are selected.
-		/// </summary>
-		/// <param name="selectList">list of IEntityFieldCore objects to select</param>
-		/// <param name="fieldsPersistenceInfo">Array of IFieldPersistenceInfo objects to use to build the select query</param>
-		/// <param name="query">The query to fill.</param>
-		/// <param name="selectFilter">A complete IPredicate implementing object which contains the filter for the rows to select. When set to null, no
-		/// filtering is done, and all rows are returned.</param>
-		/// <param name="maxNumberOfItemsToReturn">The maximum number of items to return with this retrieval query.
-		/// If the used Dynamic Query Engine supports it, 'TOP' is used to limit the amount of rows to return.
-		/// When set to 0, no limitations are specified.</param>
-		/// <param name="sortClauses">The order by specifications for the sorting of the resultset. When not specified, no sorting is applied.</param>
-		/// <param name="relationsToWalk">list of EntityRelation objects, which will be used to formulate a FROM clause with INNER JOINs.</param>
-		/// <param name="allowDuplicates">Flag which forces the inclusion of DISTINCT if set to true. If the resultset contains fields of type ntext, text or image, no duplicate filtering
-		/// is done.</param>
-		/// <param name="groupByClause">The list of fields to group by on. When not specified or an empty collection is specified, no group by clause
-		/// is added to the query. A check is performed for each field in the selectList. If a field in the selectList is not present in the groupByClause
-		/// collection, an exception is thrown.</param>
-		/// <param name="relationsSpecified">flag to signal if relations are specified, this is a result of a check. This routine should
-		/// simply assume the value of this flag is correct.</param>
-		/// <param name="sortClausesSpecified">flag to signal if sortClauses are specified, this is a result of a check. This routine should
-		/// simply assume the value of this flag is correct.</param>
-		/// <exception cref="System.ArgumentNullException">When selectList is null or fieldsPersistenceInfo is null</exception>
-		/// <exception cref="System.ArgumentException">When selectList contains no EntityFieldCore instances or fieldsPersistenceInfo is empty.</exception>
-		protected override void CreateSelectDQ(IEntityFieldCore[] selectList, IFieldPersistenceInfo[] fieldsPersistenceInfo,
-												IRetrievalQuery query, IPredicate selectFilter, long maxNumberOfItemsToReturn, ISortExpression sortClauses,
-												IRelationCollection relationsToWalk, bool allowDuplicates, IGroupByCollection groupByClause,
-												bool relationsSpecified, bool sortClausesSpecified)
+		/// <inheritdoc />
+		protected override IRetrievalQuery CreateSelectDQImpl(QueryParameters parameters, DbConnection connectionToUse, bool emitQueryHints=true)
 		{
 			TraceHelper.WriteLineIf(Switch.TraceInfo, "CreateSelectDQ", "Method Enter");
+			ArgumentVerifier.CantBeNull(parameters, nameof(parameters));
+			var toReturn = new RetrievalQuery(connectionToUse, CreateCommand(connectionToUse));
 
 			QueryFragments fragments = new QueryFragments();
 			fragments.AddFragment("SELECT");
 			StringPlaceHolder distinctPlaceholder = fragments.AddPlaceHolder();
 			StringPlaceHolder topPlaceholder = fragments.AddPlaceHolder();
-			var projection = fragments.AddCommaDelimitedQueryFragments(false, 0);
+			
+			var selectList = parameters.FieldsForQueryAsArray;
+			var fieldsPersistenceInfo = parameters.FieldPersistenceInfosForQuery;
+			DynamicQueryEngineBase.CheckSelectListAndPersistenceInfoForSelect(selectList, fieldsPersistenceInfo);
 
-			UniqueList<string> fieldNamesInSelectList;
-			bool distinctViolatingTypesFound;
-			bool pkFieldSeen;
-			AppendResultsetFields(selectList, fieldsPersistenceInfo, relationsToWalk, projection, sortClausesSpecified, allowDuplicates, true, new UniqueList<string>(),
-									query, out fieldNamesInSelectList, out distinctViolatingTypesFound, out pkFieldSeen);
+			AppendResultsetFieldsToQuery(parameters, fragments, selectList, fieldsPersistenceInfo, toReturn, distinctPlaceholder, true, new HashSet<string>(), 
+										 out var distinctEmitted, out var resultsCouldContainDuplicates);
 
-			bool resultsCouldContainDuplicates = this.DetermineIfDuplicatesWillOccur(relationsToWalk);
-			bool distinctEmitted = this.HandleDistinctEmit(sortClauses, allowDuplicates, sortClausesSpecified, query, distinctPlaceholder, distinctViolatingTypesFound,
-														(pkFieldSeen && !resultsCouldContainDuplicates), fieldNamesInSelectList);
-
-			bool groupByClauseSpecified = ((groupByClause != null) && (groupByClause.Count > 0));
-			if (maxNumberOfItemsToReturn > 0)
+			if(parameters.RowsToTake > 0)
 			{
 				// row limits are emitted always, unless duplicates are required but DISTINCT wasn't emitable. If not emitable, switch to client-side row limitation
-				if (distinctEmitted || !resultsCouldContainDuplicates || groupByClauseSpecified || allowDuplicates)
+				if(distinctEmitted || !resultsCouldContainDuplicates || parameters.GroupBySpecified || parameters.AllowDuplicates)
 				{
-					topPlaceholder.SetFormatted("TOP {0}", maxNumberOfItemsToReturn);
+					topPlaceholder.SetFormatted("TOP {0}", parameters.RowsToTake);
 				}
 				else
 				{
-					query.RequiresClientSideLimitation = true;
-					query.ManualRowsToTake = (int)maxNumberOfItemsToReturn;
+					toReturn.RequiresClientSideLimitation = true;
+					toReturn.ManualRowsToTake = parameters.RowsToTake;
 				}
 			}
-			if (relationsSpecified)
-			{
-				fragments.AddFormatted("FROM {0}", relationsToWalk.ToQueryText());
-				query.AddParameters(((RelationCollection)relationsToWalk).CustomFilterParameters);
-			}
-			else
-			{
-				var persistenceInfoToUse = fieldsPersistenceInfo.FirstOrDefault(p => p != null);
-				if ((persistenceInfoToUse != null) && (persistenceInfoToUse.SourceObjectName.Length > 0))
-				{
-					fragments.AddFormatted(" FROM {0}", this.Creator.CreateObjectName(persistenceInfoToUse));
-					string targetAlias = this.DetermineTargetAlias(selectList[0], relationsToWalk);
-					if (targetAlias.Length > 0)
-					{
-						fragments.AddFormatted(" {0}", this.Creator.CreateValidAlias(targetAlias));
-					}
-				}
-			}
-			AppendWhereClause(selectFilter, fragments, query);
-			AppendGroupByClause(groupByClause, fragments, query);
-			AppendOrderByClause(sortClauses, fragments, query);
-			query.SetCommandText(MakeParametersAnonymous(fragments.ToString(), query.Parameters));
+			AppendFromClause(parameters, fragments, toReturn, fieldsPersistenceInfo, selectList);
+			AppendWhereClause(parameters.FilterToUse, fragments, toReturn);
+			AppendGroupByClause(parameters.GroupByToUse, fragments, toReturn);
+			AppendOrderByClause(parameters.SorterToUse, fragments, toReturn);
+			
+			toReturn.SetCommandText(MakeParametersAnonymous(fragments.ToString(), toReturn.Parameters));
 
-			TraceHelper.WriteIf(Switch.TraceVerbose, query, "Generated Sql query");
+			TraceHelper.WriteIf(Switch.TraceVerbose, toReturn, "Generated Sql query");
 			TraceHelper.WriteLineIf(Switch.TraceInfo, "CreateSelectDQ", "Method Exit");
+			return toReturn;
 		}
 
 
-		/// <summary>
-		/// Creates a new Select Query which is ready to use, based on the specified select list and the specified set of relations.
-		/// If selectFilter is set to null, all rows are selected.
-		/// </summary>
-		/// <param name="selectList">list of IEntityFieldCore objects to select</param>
-		/// <param name="fieldsPersistenceInfo">Array of IFieldPersistenceInfo objects to use to build the select query</param>
-		/// <param name="connectionToUse">The connection to use for the query</param>
-		/// <param name="selectFilter">A complete IPredicate implementing object which contains the filter for the rows to select. When set to null, no
-		/// filtering is done, and all rows are returned.</param>
-		/// <param name="rowsToSkip">The rows to skip. Default 0</param>
-		/// <param name="rowsToTake">The rows to take. Default 0, which means all.</param>
-		/// <param name="sortClauses">The order by specifications for the sorting of the resultset. When not specified, no sorting is applied.</param>
-		/// <param name="relationsToWalk">list of EntityRelation objects, which will be used to formulate a FROM clause with INNER JOINs.</param>
-		/// <param name="allowDuplicates">Flag which forces the inclusion of DISTINCT if set to true. If the resultset contains fields of type ntext, text or image, no duplicate filtering
-		/// is done.</param>
-		/// <param name="groupByClause">The list of fields to group by on. When not specified or an empty collection is specified, no group by clause
-		/// is added to the query. A check is performed for each field in the selectList. If a field in the selectList is not present in the groupByClause
-		/// collection, an exception is thrown.</param>
-		/// <returns>
-		/// IRetrievalQuery instance which is ready to be used.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">When selectList is null or fieldsPersistenceInfo is null or relationsToWalk is null</exception>
-		/// <exception cref="System.ArgumentException">When selectList contains no EntityFieldCore instances or fieldsPersistenceInfo is empty.</exception>
-		/// <remarks>
-		/// Generic version
-		/// </remarks>
-		protected override IRetrievalQuery CreatePagingSelectDQ(IEntityFieldCore[] selectList, IFieldPersistenceInfo[] fieldsPersistenceInfo,
-																DbConnection connectionToUse, IPredicate selectFilter, int rowsToSkip, int rowsToTake,
-																ISortExpression sortClauses, IRelationCollection relationsToWalk, bool allowDuplicates,
-																IGroupByCollection groupByClause)
+		/// <inheritdoc />
+		protected override IRetrievalQuery CreatePagingSelectDQ(QueryParameters parameters, DbConnection connectionToUse)
 		{
 			TraceHelper.WriteLineIf(Switch.TraceInfo, "CreatePagingSelectDQ", "Method Enter");
 
 			long max = 0;
 			bool pagingRequired = true;
-			if (rowsToSkip <= 0)
+			if(parameters.RowsToSkip <= 0)
 			{
 				// no paging.
-				max = rowsToTake;
+				max = parameters.RowsToTake;
 				pagingRequired = false;
 			}
 
-			IRetrievalQuery normalQuery = this.CreateSelectDQ(selectList, fieldsPersistenceInfo, connectionToUse, selectFilter, max, sortClauses, relationsToWalk, allowDuplicates, groupByClause);
+			IRetrievalQuery normalQuery = this.CreateSelectDQImpl(parameters, connectionToUse, !pagingRequired);
 			if (!pagingRequired)
 			{
 				TraceHelper.WriteLineIf(Switch.TraceInfo, "CreatePagingSelectDQ: no paging.", "Method Exit");
@@ -382,26 +309,26 @@ namespace SD.LLBLGen.Pro.DQE.SybaseAsa
 			{
 				// manual paging required
 				normalQuery.RequiresClientSidePaging = pagingRequired;
-				normalQuery.ManualRowsToSkip = rowsToSkip;
-				normalQuery.ManualRowsToTake = rowsToTake;
+				normalQuery.ManualRowsToSkip = parameters.RowsToSkip;
+				normalQuery.ManualRowsToTake = parameters.RowsToTake;
 			}
 			else
 			{
 				// normal paging. Embed paging logic. There is no TOP statement in the query as we've passed '0' for maxAmountOfItemsToReturn
 				string upperLimitSnippet = string.Empty;
-				if (rowsToTake > 0)
+				if (parameters.RowsToTake > 0)
 				{
-					upperLimitSnippet = string.Format(" TOP {0}", rowsToTake);
+					upperLimitSnippet = string.Format(" TOP {0}", parameters.RowsToTake);
 				}
 				if (normalQuery.Command.CommandText.ToLowerInvariant().StartsWith("select distinct"))
 				{
 					normalQuery.Command.CommandText = String.Format("SELECT DISTINCT{0} START AT {1} {2}",
-																	upperLimitSnippet, rowsToSkip + 1, normalQuery.Command.CommandText.Substring(16));
+																	upperLimitSnippet, parameters.RowsToTake + 1, normalQuery.Command.CommandText.Substring(16));
 				}
 				else
 				{
 					normalQuery.Command.CommandText = String.Format("SELECT{0} START AT {1} {2}",
-																	upperLimitSnippet, rowsToSkip + 1, normalQuery.Command.CommandText.Substring(7));
+																	upperLimitSnippet, parameters.RowsToTake + 1, normalQuery.Command.CommandText.Substring(7));
 				}
 				emitQueryToTrace = true;
 			}
